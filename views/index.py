@@ -28,17 +28,22 @@ def IndexView(page:ft.Page, params):
     def btn_simple_clicked(e):
         page.go("/simple_view")
 
-    txt = ft.Text("Welcome to the Flet Template", font_family="playwrite")
-    col_right = ft.Row(controls=[txt], alignment=ft.MainAxisAlignment.END)
-    btn_question1 = ft.ElevatedButton("Question1", on_click=btn_question1_clicked)
-    btn_question2 = ft.ElevatedButton("Question2", on_click=btn_question2_clicked)
-    btn_simple = ft.ElevatedButton("Simple View", on_click=btn_simple_clicked)
+
+
+
+    #create controls
     img_1 = ft.Image(src="images/m1.jpg", width=300)
+    user_input=ft.TextField(label="enter a word:")
+    txt=ft.Text("right")
+    left_column= ft.Column(controls = [img_1, user_input])
+    right_column=ft.Column(controls=[txt])
+    main_row=ft.Row(controls=[left_column,right_column])
     appbar = CreateAppBar()
+
 
     page.views.append(ft.View(
         "/",
-        [appbar, col_right, btn_question1, btn_question2, btn_simple, img_1],
+        [appbar, main_row],
 
     )
     )
