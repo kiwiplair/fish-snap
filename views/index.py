@@ -32,10 +32,11 @@ def IndexView(page:ft.Page, params):
 
 
     #create controls
+    submit_button = ft.OutlinedButton("submit")
     img_1 = ft.Image(src="images/m1.jpg", width=300)
     user_input=ft.TextField(label="enter a word:")
     txt=ft.Text("right")
-    left_column= ft.Column(controls = [img_1, user_input])
+    left_column= ft.Column(controls = [img_1, user_input,submit_button])
     right_column=ft.Column(controls=[txt])
     main_row=ft.Row(controls=[left_column,right_column])
     appbar = CreateAppBar()
