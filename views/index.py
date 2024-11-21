@@ -1,14 +1,25 @@
 import flet as ft
 import data.questions as questions
 def IndexView(page:ft.Page, params):
-    def new_round(question):
-       question_image.src = "game_images\\" + question[0]
-       for i in range(1,len(question)):
+    def new_round(index):
+       question_image.src = "game_images\\" + questions.get_image_url(index)
+       answers = questions.get_answer(index)
+
+       for answer_text, point in answers:
                row= ft.Row()
-               #go to each alphabet of the answe
-               for x in question[i]:
-                   letter = ft.Text(x.upper())
-                   row.controls.append(letter)
+               #go to each alphabet of the answer
+               counter=0
+               for x in answer_text:
+                   if counter==0:
+                       txt=x
+                   else:
+                       txt=" "
+                   letter = ft.Text(txt.upper())
+                   con=ft.Container(content=letter,bgcolor=ft.colors.PRIMARY_CONTAINER, width=30,height=30)
+                   row.controls.append(con)
+                   counter+=1
+               score_box=ft.Text("+" + str(point))
+               row.controls.append(score_box)
                answers_column.controls.append(row)
        page.update()
     def CreateAppBar():
@@ -51,7 +62,8 @@ def IndexView(page:ft.Page, params):
     right_column=ft.Column(controls=[answers_column])
     main_row=ft.Row(controls=[left_column,right_column])
     appbar = CreateAppBar()
-    new_round(questions.all_questions[0])
+
+    new_round(0)
     page.views.append(ft.View(
         "/",
         [appbar, main_row,
