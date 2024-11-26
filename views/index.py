@@ -1,12 +1,42 @@
 import flet as ft
 import data.questions as questions
 def IndexView(page:ft.Page, params):
+    def submit_clicked(e):
+        nonlocal  score
+
+        user_answer=user_input.value.strip().upper()
+        if user_answer in lst_user_answers:
+            return
+        print(user_answer)
+        answers= questions.get_answers(question_index)
+        i=0
+        valid = False
+        for ans,point in answers:
+            ans=ans.upper()
+            if user_answer == ans:
+                valid = True
+                score+=point
+                print(score)
+                for j in range( len(ans)):
+                    lst_answer_boxes[i][j].content.value = ans[j].upper()
+
+                break
+            i+=1
+
+        if valid:
+            lst_user_answers.append(user_answer)
+            score_text.value = score
+        page.update()
+
+        print(answers)
+
     def new_round(index):
        question_image.src = "game_images\\" + questions.get_image_url(index)
-       answers = questions.get_answer(index)
+       answers = questions.get_answers(index)
 
        for answer_text, point in answers:
                row= ft.Row()
+               L1 =[]
                #go to each alphabet of the answer
                counter=0
                for x in answer_text:
@@ -15,9 +45,12 @@ def IndexView(page:ft.Page, params):
                    else:
                        txt=" "
                    letter = ft.Text(txt.upper())
-                   con=ft.Container(content=letter,bgcolor=ft.colors.PRIMARY_CONTAINER, width=30,height=30)
+                   con=ft.Container(content=letter,bgcolor=ft.colors.PRIMARY_CONTAINER, width=30,height=30,
+                                    alignment=ft.alignment.center)
                    row.controls.append(con)
+                   L1.append(con)
                    counter+=1
+               lst_answer_boxes.append(L1)
                score_box=ft.Text("+" + str(point))
                row.controls.append(score_box)
                answers_column.controls.append(row)
@@ -50,23 +83,30 @@ def IndexView(page:ft.Page, params):
         page.go("/simple_view")
 
 
+    #Game variables
+    question_index =2
+    score = 0
 
 
+    lst_answer_boxes = []
     #create controls
-    submit_button = ft.OutlinedButton("submit")
+    lst_user_answers=[]
+    submit_button = ft.OutlinedButton("submit",on_click=submit_clicked )
     question_image = ft.Image(src="game_images/beach.jpg", width=600)
     user_input=ft.TextField(label="enter a word:")
     txt=ft.Text("right")
     answers_column=ft.Column()
     left_column= ft.Column(controls = [question_image, user_input,submit_button])
     right_column=ft.Column(controls=[answers_column])
+    score_text = ft.Text("0")
+    score_row=ft.Row(controls=[score_text])
     main_row=ft.Row(controls=[left_column,right_column])
     appbar = CreateAppBar()
 
-    new_round(0)
+    new_round(question_index)
     page.views.append(ft.View(
         "/",
-        [appbar, main_row,
+        [appbar,score_row, main_row
 ],
 
     )
