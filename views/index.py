@@ -1,6 +1,14 @@
 import flet as ft
 import data.questions as questions
+import random
+
+
 def IndexView(page:ft.Page, params):
+    def update_score(s):
+        nonlocal score
+        score+=s
+        score_text.value="Score: " + str(score)
+
     def submit_clicked(e):
         nonlocal  score
 
@@ -15,25 +23,32 @@ def IndexView(page:ft.Page, params):
             ans=ans.upper()
             if user_answer == ans:
                 valid = True
-                score+=point
-                print(score)
+
+
                 for j in range( len(ans)):
                     lst_answer_boxes[i][j].content.value = ans[j].upper()
+                    lst_answer_boxes[i][j].bgcolor = ft.colors.SURFACE
+
 
                 break
             i+=1
 
         if valid:
             lst_user_answers.append(user_answer)
-            score_text.value = score
+            update_score(point)
+            user_input.value= ""
+            user_input.focus()
         page.update()
 
         print(answers)
 
     def new_round(index):
        question_image.src = "game_images\\" + questions.get_image_url(index)
-       answers = questions.get_answers(index)
+       question_image.width=750
+       question_image.height = 450
 
+       answers = questions.get_answers(index)
+       answers_column.controls.clear()
        for answer_text, point in answers:
                row= ft.Row()
                L1 =[]
@@ -46,7 +61,7 @@ def IndexView(page:ft.Page, params):
                        txt=" "
                    letter = ft.Text(txt.upper())
                    con=ft.Container(content=letter,bgcolor=ft.colors.PRIMARY_CONTAINER, width=30,height=30,
-                                    alignment=ft.alignment.center)
+                                    alignment=ft.alignment.center, animate=ft.Animation(2000))
                    row.controls.append(con)
                    L1.append(con)
                    counter+=1
@@ -70,9 +85,11 @@ def IndexView(page:ft.Page, params):
         )
         return app_bar
 
+
     def restart_clicked(e):
-         dlg = ft.AlertDialog(title=ft.Text("You clicked restart"))
-         page.open(dlg)
+
+        i= random.randrange(0,len(questions.all_questions))
+        new_round(i)
     def btn_question1_clicked(e):
         page.go("/question/1")
 
@@ -84,7 +101,7 @@ def IndexView(page:ft.Page, params):
 
 
     #Game variables
-    question_index =2
+    question_index =3
     score = 0
 
 
@@ -93,20 +110,22 @@ def IndexView(page:ft.Page, params):
     lst_user_answers=[]
     submit_button = ft.OutlinedButton("submit",on_click=submit_clicked )
     question_image = ft.Image(src="game_images/beach.jpg", width=600)
-    user_input=ft.TextField(label="enter a word:")
+    user_input=ft.TextField(label="enter a word:", on_submit= submit_clicked)
     txt=ft.Text("right")
     answers_column=ft.Column()
-    left_column= ft.Column(controls = [question_image, user_input,submit_button])
+    left_column= ft.Column(controls = [question_image, user_input,submit_button], alignment=ft.alignment.top_center)
     right_column=ft.Column(controls=[answers_column])
-    score_text = ft.Text("0")
+    score_text = ft.Text("Score: 0",size=30,color=ft.colors.TERTIARY)
     score_row=ft.Row(controls=[score_text])
-    main_row=ft.Row(controls=[left_column,right_column])
+    line_1 = ft.Divider(height=1, color=ft.colors.SECONDARY_CONTAINER)
+
+    main_row=ft.Row(controls=[left_column,right_column], vertical_alignment=ft.CrossAxisAlignment.START)
     appbar = CreateAppBar()
 
     new_round(question_index)
     page.views.append(ft.View(
         "/",
-        [appbar,score_row, main_row
+        [appbar,score_row, line_1, main_row
 ],
 
     )
